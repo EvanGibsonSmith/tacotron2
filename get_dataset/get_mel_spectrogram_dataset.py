@@ -1,8 +1,11 @@
 
-from tacotron2.data_utils import TextMelLoader
+from tacotron2.data_utils import TextMelLoader, TextMelCollate
+from torch.utils.data import DataLoader
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
 import librosa
+import os
+import torch
 
 hparams = SimpleNamespace(
     text_cleaners=['english_cleaners'],
@@ -19,10 +22,30 @@ hparams = SimpleNamespace(
 )
 
 validation_files = r"tacotron2\get_dataset\ljs_audio_text_val_filelist.txt"
-trainset = TextMelLoader(validation_files, hparams)
+valset = TextMelLoader(validation_files, hparams) 
+
+collate_fn = TextMelCollate(1) # Only 1 is supported by Tacotron
+val_loader = DataLoader(valset, sampler=None, num_workers=1,
+                                shuffle=False, batch_size=1,
+                                pin_memory=False, collate_fn=collate_fn)
+
+save_dir = r"tacotron2\get_dataset\text_mel_data"
+os.makedirs(save_dir, exist_ok=True)
+
+for i in range(len(valset)):
+    text, mel = valset[i]  # text: LongTensor, mel: [n_mel, T]
+
+    example = {
+        "text": text,
+        "text_len": torch.LongTensor([len(text)]),
+        "mel": mel,
+        "mel_len": torch.LongTensor([mel.shape[1]])  # time dimension
+    }
+
+    torch.save(example, os.path.join(save_dir, f"sample_{i}.pt"))
 
 # Get the mel spectrogram and text corresponding to that index
-text, mel = trainset[5]
+text, mel = valset[5]
 
 # If `mel` is a PyTorch tensor, you need to move it to CPU and convert to numpy for plotting
 mel = mel.squeeze(0).cpu().numpy()  # Remove batch dimension and move to CPU
