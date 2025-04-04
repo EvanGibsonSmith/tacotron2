@@ -275,6 +275,7 @@ if __name__ == '__main__':
                         required=False, help='comma separated name=value pairs')
 
     args = parser.parse_args()
+    print("HPARAMS: ", args.hparams)
     hparams = create_hparams(args.hparams)
 
     torch.backends.cudnn.enabled = hparams.cudnn_enabled

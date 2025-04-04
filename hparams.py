@@ -1,11 +1,12 @@
 import tensorflow as tf
 from text import symbols
-
+from types import SimpleNamespace
 
 def create_hparams(hparams_string=None, verbose=False):
     """Create model hyperparameters. Parse nondefault from given string."""
-
-    hparams = tf.contrib.training.HParams(
+    
+    # NOTE: Was tf.contrib.training.HParams but that is outdated for Python 3.11
+    hparams = SimpleNamespace(
         ################################
         # Experiment Parameters        #
         ################################
@@ -25,8 +26,8 @@ def create_hparams(hparams_string=None, verbose=False):
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        training_files='filelists/ljs_audio_text_train_filelist.txt',
-        validation_files='filelists/ljs_audio_text_val_filelist.txt',
+        training_files='LJSpeech\metadata.csv', # NOTE: Modified for my file path
+        validation_files='LJSpeech\metadata.csv',
         text_cleaners=['english_cleaners'],
 
         ################################
