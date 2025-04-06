@@ -5,7 +5,7 @@ from torch import nn
 from torch.nn import functional as F
 from .layers import ConvNorm, LinearNorm
 from .utils import to_gpu, get_mask_from_lengths
-
+from types import SimpleNamespace
 
 class LocationLayer(nn.Module):
     def __init__(self, attention_n_filters, attention_kernel_size,
@@ -457,6 +457,8 @@ class Decoder(nn.Module):
 class Tacotron2(nn.Module):
     def __init__(self, hparams):
         super(Tacotron2, self).__init__()
+        
+        self.hparams = hparams
         self.mask_padding = hparams.mask_padding
         self.fp16_run = hparams.fp16_run
         self.n_mel_channels = hparams.n_mel_channels
